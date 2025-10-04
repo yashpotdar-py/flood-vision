@@ -5,6 +5,8 @@ build/
 dist/
 wheels/
 *.egg-info
+# VS Code
+.vscode/
 
 # Virtual environments
 .venv
@@ -13,4 +15,4 @@ wheels/
 uv.lock
 
 # Data
-data*/
+data/

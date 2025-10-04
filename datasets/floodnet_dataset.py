@@ -54,7 +54,7 @@ class FloodNetDataset(Dataset):
         mask = Image.open(mask_path)
 
         # resize both image and mask for torch tensor conversion
-        img = TF.resize(img_path, self.resize, interpolation=Image.BILINEAR)
+        img = TF.resize(img, self.resize, interpolation=Image.BILINEAR)  # fixed: img_path -> img: caused error due to string input
         mask = TF.resize(mask, self.resize, interpolation=Image.NEAREST)
 
         # data augmentation for training

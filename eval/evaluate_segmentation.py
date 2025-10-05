@@ -1,3 +1,17 @@
+"""
+eval/evaluate_segmentation.py
+
+Evaluates a trained semantic segmentation model on the FloodNet validation set.
+Computes pixel accuracy, mean IoU, and class-wise IoU metrics.
+
+Usage:
+    python -m eval.evaluate_segmentation
+    
+Requirements:
+    - Trained model checkpoint at 'checkpoint_unet.pth'
+    - FloodNet dataset at 'data/FloodNet-Supervised_v1.0'
+"""
+
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
@@ -12,7 +26,17 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def compute_iou(preds, labels, num_classes):
-    """Computes mean IoU across all classes."""
+    """
+    Computes mean IoU across all classes.
+
+    Args:
+        preds (torch.Tensor): Predicted class labels (flattened).
+        labels (torch.Tensor): Ground truth class labels (flattened).
+        num_classes (int): Number of classes in the dataset.
+
+    Returns:
+        (float, list): Mean IoU and list of per-class IoU values.
+    """
     ious = []
     preds = preds.view(-1)
     labels = labels.view(-1)
@@ -30,6 +54,17 @@ def compute_iou(preds, labels, num_classes):
 
 
 def evaluate(model, loader, num_classes=10):
+    """
+    Evaluate the model on a data loader.
+
+    Args:
+        model (torch.nn.Module): Trained segmentation model.
+        loader (DataLoader): Validation data loader.
+        num_classes (int): Number of classes. Default is 10.
+
+    Returns:
+        (float, float, np.ndarray): Pixel accuracy, mean IoU, and class-wise IoU array.
+    """
     model.eval()
     total_correct, total_pixels = 0, 0
     total_iou, iou_list = 0, np.zeros(num_classes)
@@ -56,6 +91,10 @@ def evaluate(model, loader, num_classes=10):
 
 
 def main():
+    """
+    Main evaluation routine. Loads model, creates data loader, runs evaluation,
+    and prints results.
+    """
     # === Paths ===
     ROOT = "data\\FloodNet-Supervised_v1.0"
     val_img = os.path.join(ROOT, "val/val-org-img")

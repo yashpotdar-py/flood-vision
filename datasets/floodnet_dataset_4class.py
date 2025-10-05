@@ -1,3 +1,10 @@
+"""
+datasets/floodnet_dataset_4class.py
+FloodNet Dataset for 4-class semantic segmentation.
+This dataset class loads FloodNet images and corresponding masks, remapping the original
+class labels to 4 classes. Supports optional data augmentation and normalization.
+
+"""
 import os
 from torch.utils.data import Dataset
 from PIL import Image
@@ -20,6 +27,44 @@ CLASS_MAP = {
 
 
 class FloodNetDataset4Class(Dataset):
+    """
+    FloodNet Dataset for 4-class semantic segmentation.
+    This dataset class loads FloodNet images and corresponding masks, remapping the original
+    class labels to 4 classes. Supports optional data augmentation and normalization.
+    The dataset expects:
+        - img_dir: Directory containing RGB images
+        - mask_dir: Directory containing corresponding mask images
+    The class remaps original FloodNet labels to 4 classes using CLASS_MAP dictionary.
+    Images and masks are matched by sorted order in their respective directories.
+    Augmentations applied (when augment=True):
+        - Resize to specified dimensions
+        - Horizontal flip (p=0.5)
+        - Vertical flip (p=0.3)
+        - Random brightness/contrast adjustment (p=0.4)
+        - Hue/saturation/value adjustment (p=0.3)
+        - Gaussian blur (p=0.2)
+        - Random 90° rotation (p=0.3)
+        - ImageNet normalization
+    Without augmentation, only resize and normalization are applied.
+    Returns:
+        Tuple of (image_tensor, mask_tensor) where:
+            - image_tensor: [C, H, W] float32 tensor, normalized
+            - mask_tensor: [H, W] long tensor with remapped class labels
+    Usage:
+        train_dataset = FloodNetDataset4Class(
+            img_dir='data/train/images',
+            mask_dir='data/train/masks',
+            resize=(512, 512),
+            augment=True
+        )
+        val_dataset = FloodNetDataset4Class(
+            img_dir='data/val/images',
+            mask_dir='data/val/masks',
+            resize=(512, 512),
+            augment=False
+        )
+    """
+
     def __init__(self, img_dir, mask_dir, resize=(512, 512), augment=False):
         self.img_dir = img_dir
         self.mask_dir = mask_dir

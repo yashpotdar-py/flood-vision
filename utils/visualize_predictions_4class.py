@@ -1,3 +1,25 @@
+"""
+utils/visualize_predictions_4class.py
+
+Visualizes segmentation predictions from a trained DeepLab model on the FloodNet
+validation set. Displays original images, ground truth masks, and model predictions
+side-by-side for visual inspection.
+
+The script uses a 4-class segmentation scheme:
+    - Class 0: background (black)
+    - Class 1: flooded building (red)
+    - Class 2: flooded road (yellow)
+    - Class 3: water (blue)
+
+Usage:
+    python -m utils.visualize_predictions_4class
+    
+    Or modify the model_path and sample_count in __main__ block before running.
+
+Requirements:
+    torch, numpy, matplotlib, datasets.floodnet_dataset_4class, models.deeplab_model
+"""
+
 import os
 import torch
 import numpy as np
@@ -16,6 +38,15 @@ CLASS_COLORS = {
 
 
 def mask_to_rgb(mask):
+    """
+    Convert a single-channel segmentation mask to RGB using class colors.
+    
+    Args:
+        mask (np.ndarray): 2D array with class indices.
+        
+    Returns:
+        np.ndarray: RGB image (H, W, 3) with colors assigned per class.
+    """
     rgb = np.zeros((*mask.shape, 3), dtype=np.uint8)
     for cls, color in CLASS_COLORS.items():
         rgb[mask == cls] = color
@@ -23,6 +54,16 @@ def mask_to_rgb(mask):
 
 
 def visualize_predictions(model_path, sample_count=5):
+    """
+    Load a trained model and visualize predictions on validation samples.
+    
+    Displays sample_count triplets of (original image, ground truth, prediction)
+    using matplotlib. Images are resized to 512x512 for inference.
+    
+    Args:
+        model_path (str): Path to the trained model checkpoint (.pth file).
+        sample_count (int): Number of validation samples to visualize.
+    """
     ROOT = r"C:\Users\yashy\projects\flood-vision\data\FloodNet-Supervised_v1.0"
     val_img = os.path.join(ROOT, "val/val-org-img")
     val_mask = os.path.join(ROOT, "val/val-label-img")

@@ -1,3 +1,19 @@
+"""
+train/train_segmentation.py
+
+Trains a U-Net segmentation model on the FloodNet training set and validates
+on the FloodNet validation set using 10 classes.
+
+Computes:
+    - Training loss per epoch
+    - Validation loss and pixel accuracy per epoch
+    - Saves best model checkpoint based on validation loss
+
+Usage:
+    pip install torch torchvision numpy tqdm
+    python -m train.train_segmentation
+"""
+
 import os
 import torch
 import torch.nn as nn
@@ -12,6 +28,18 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def train_one_epoch(model, loader, optimizer, criterion):
+    """
+    Train the model for one epoch.
+
+    Args:
+        model (torch.nn.Module): Segmentation model to train.
+        loader (DataLoader): Training data loader.
+        optimizer (torch.optim.Optimizer): Optimizer for model parameters.
+        criterion (torch.nn.Module): Loss function.
+
+    Returns:
+        float: Average training loss for the epoch.
+    """
     model.train()
     total_loss = 0
     # train loop for one epoch
@@ -29,6 +57,17 @@ def train_one_epoch(model, loader, optimizer, criterion):
 
 
 def validate_one_epoch(model, loader, criterion):
+    """
+    Validate the model for one epoch.
+
+    Args:
+        model (torch.nn.Module): Segmentation model to validate.
+        loader (DataLoader): Validation data loader.
+        criterion (torch.nn.Module): Loss function.
+
+    Returns:
+        (float, float): Tuple of average validation loss and pixel accuracy.
+    """
     model.eval()
     total_loss = 0
     correct_pixels = 0
@@ -52,6 +91,11 @@ def validate_one_epoch(model, loader, criterion):
 
 
 def main():
+    """
+    Main training function. Loads the training and validation datasets,
+    initializes the model, and runs the training loop for 10 epochs.
+    Saves the best model checkpoint based on validation loss.
+    """
     #  === Paths ===
     ROOT = "data\\FloodNet-Supervised_v1.0"
     train_img = os.path.join(ROOT, "train/train-org-img")

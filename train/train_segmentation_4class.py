@@ -1,3 +1,21 @@
+"""
+train/train_segmentation_4class.py
+
+Trains a DeepLab segmentation model on the FloodNet dataset using 4 classes:
+Background, Flooded Building, Flooded Road, Water.
+
+Features:
+    - Training with data augmentation
+    - Validation monitoring
+    - Learning rate scheduling (ReduceLROnPlateau)
+    - Best model checkpoint saving based on validation loss
+    - Combined Dice + Cross-Entropy loss (ComboLoss)
+
+Usage:
+    pip install torch torchvision numpy tqdm
+    python -m train.train_segmentation_4class
+"""
+
 import os
 import torch
 import torch.nn as nn
@@ -12,6 +30,18 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def train_one_epoch(model, loader, optimizer, criterion):
+    """
+    Train the model for one epoch.
+
+    Args:
+        model (torch.nn.Module): Segmentation model.
+        loader (DataLoader): Training data loader.
+        optimizer (torch.optim.Optimizer): Optimizer.
+        criterion (torch.nn.Module): Loss function.
+
+    Returns:
+        float: Average training loss for the epoch.
+    """
     model.train()
     total_loss = 0
     for imgs, masks in tqdm(loader, desc="Train", leave=False):
@@ -26,6 +56,17 @@ def train_one_epoch(model, loader, optimizer, criterion):
 
 
 def validate(model, loader, criterion):
+    """
+    Validate the model on the validation set.
+
+    Args:
+        model (torch.nn.Module): Segmentation model.
+        loader (DataLoader): Validation data loader.
+        criterion (torch.nn.Module): Loss function.
+
+    Returns:
+        float: Average validation loss.
+    """
     model.eval()
     total_loss = 0
     with torch.no_grad():
@@ -38,6 +79,10 @@ def validate(model, loader, criterion):
 
 
 def main():
+    """
+    Main training function. Loads datasets, initializes model and optimizer,
+    and runs the training loop for 25 epochs with validation.
+    """
     ROOT = "data\\FloodNet-Supervised_v1.0"
     train_img = os.path.join(ROOT, "train/train-org-img")
     train_mask = os.path.join(ROOT, "train/train-label-img")

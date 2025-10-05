@@ -1,3 +1,19 @@
+"""
+eval/evaluate_segmentation_4class.py
+
+Evaluates a trained DeepLab segmentation model on the FloodNet validation set
+using 4 classes: Background, Flooded Building, Flooded Road, Water.
+
+Computes:
+    - Pixel Accuracy
+    - Mean IoU (Intersection over Union)
+    - Class-wise IoU for each of the 4 classes
+
+Usage:
+        pip install torch torchvision numpy tqdm
+        python -m eval.evaluate_segmentation_4class
+"""
+
 import os
 import torch
 import torch.nn.functional as F
@@ -14,7 +30,17 @@ CLASS_NAMES = ["Background", "Flooded Building", "Flooded Road", "Water"]
 
 
 def compute_iou(preds, labels, num_classes=4):
-    """Compute mean IoU across classes."""
+    """
+    Compute mean IoU across classes.
+
+    Args:
+            preds (torch.Tensor): Predicted class labels (flattened or batched).
+            labels (torch.Tensor): Ground truth class labels.
+            num_classes (int): Number of classes.
+
+    Returns:
+            (float, list): Tuple of mean IoU and list of per-class IoU values.
+    """
     ious = []
     preds = preds.view(-1)
     labels = labels.view(-1)
@@ -32,6 +58,18 @@ def compute_iou(preds, labels, num_classes=4):
 
 
 def evaluate(model, loader, num_classes=4):
+    """
+    Evaluate the model on a given data loader.
+
+    Args:
+            model (torch.nn.Module): Trained segmentation model.
+            loader (DataLoader): Validation data loader.
+            num_classes (int): Number of segmentation classes.
+
+    Returns:
+            (float, float, np.ndarray): Tuple of pixel accuracy, mean IoU, 
+                                                                     and class-wise IoU array.
+    """
     model.eval()
     total_correct, total_pixels = 0, 0
     total_iou, classwise_iou = 0, np.zeros(num_classes)
@@ -57,6 +95,10 @@ def evaluate(model, loader, num_classes=4):
 
 
 def main():
+    """
+    Main evaluation function. Loads the validation dataset, model checkpoint,
+    and prints evaluation metrics.
+    """
     ROOT = "data\\FloodNet-Supervised_v1.0"
     val_img = os.path.join(ROOT, "val/val-org-img")
     val_mask = os.path.join(ROOT, "val/val-label-img")

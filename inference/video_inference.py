@@ -1,3 +1,17 @@
+"""
+inference/video_inference.py
+
+Run semantic segmentation inference on a video file using a DeepLabv3+ model.
+Processes each frame of the input video, applies the trained flood segmentation model,
+and generates an overlay visualization combining the original frame with the predicted
+segmentation mask. Optionally saves the output video and/or displays results in real-time.
+
+Usage:
+    python -m inference.video_inference
+    
+    Or modify the video_path and output_path in __main__ block before running.
+"""
+
 import cv2
 import torch
 import torch.nn.functional as F
@@ -37,6 +51,33 @@ def preprocess_frame(frame, size=(512, 512)):
 
 
 def run_inference(video_path, output_path=None, display=True):
+    """
+    Run semantic segmentation inference on a video file using a DeepLabv3+ model.
+    Processes each frame of the input video, applies the trained flood segmentation model,
+    and generates an overlay visualization combining the original frame with the predicted
+    segmentation mask. Optionally saves the output video and/or displays results in real-time.
+    Args:
+        video_path (str): Path to the input video file to process.
+        output_path (str, optional): Path where the output video will be saved. 
+            If None, no output file is written. Defaults to None.
+        display (bool, optional): Whether to display the segmentation overlay in a 
+            window during processing. Press 'q' to quit early. Automatically disables 
+            if OpenCV display is not supported in the environment. Defaults to True.
+    Returns:
+        None
+    Notes:
+        - Loads the model from 'checkpoint_deeplab_4class.pth' with 4 output classes
+        - Uses the global DEVICE variable for GPU/CPU placement
+        - Expects preprocess_frame() and mask_to_overlay() helper functions
+        - Output video codec is 'mp4v'
+        - Mask is resized to match original frame dimensions using nearest neighbor interpolation
+        - Gracefully handles headless environments by disabling display
+    Example:
+        >>> run_inference('input.mp4', output_path='output.mp4', display=True)
+        🎥 Processing video: input.mp4 (1500 frames, 30 FPS)
+        100%|██████████| 1500/1500 [02:30<00:00, 10.00it/s]
+        ✅ Output saved at: output.mp4
+    """
     model = get_deeplab_model(num_classes=4)
     model.load_state_dict(torch.load(
         "checkpoint_deeplab_4class.pth", map_location=DEVICE))

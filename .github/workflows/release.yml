@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # checkout code
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # access full git history
+
+      # setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # install semantic-release and plugins
+      - name: Install semantic-release
+        run: |
+          npm install -g semantic-release \
+            @semantic-release/git \
+            @semantic-release/changelog \
+            @semantic-release/github
+
+      # run semantic-release
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          semantic-release

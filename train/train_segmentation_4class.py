@@ -96,7 +96,10 @@ def main():
     val_loader = DataLoader(val_ds, batch_size=4, shuffle=False, num_workers=2)
 
     model = get_deeplab_model(num_classes=4).to(DEVICE)
-    criterion = ComboLoss(num_classes=4, alpha=0.7)
+    # Weighted for minority classes: [Background, Flooded Building, Flooded Road, Water]
+    class_weights = [0.5, 4.0, 3.0, 2.0]
+    criterion = ComboLoss(num_classes=4, alpha=0.7,
+                          class_weights=class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, patience=3, factor=0.5)

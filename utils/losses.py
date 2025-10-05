@@ -20,9 +20,14 @@ class DiceLoss(nn.Module):
 
 
 class ComboLoss(nn.Module):
-    def __init__(self, num_classes=4, alpha=0.7):
+    def __init__(self, num_classes=4, alpha=0.7, class_weights=None):
         super(ComboLoss, self).__init__()
-        self.ce = nn.CrossEntropyLoss()
+        if class_weights is not None:
+            class_weights = torch.tensor(class_weights, dtype=torch.float32).to(
+                "cuda" if torch.cuda.is_available() else "cpu")
+            self.ce = nn.CrossEntropyLoss(weight=class_weights)
+        else:
+            self.ce = nn.CrossEntropyLoss()
         self.dice = DiceLoss()
         self.alpha = alpha
         self.num_classes = num_classes

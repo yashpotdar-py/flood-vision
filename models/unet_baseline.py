@@ -12,6 +12,7 @@ Usage:
 
 import segmentation_models_pytorch as smp
 # TODO: filter and list out actually needed classes for the actual implementation
+# TODO: explore better alternatives for segmentation_models_pytorch
 def get_unet_model(num_classes=10, encoder="resnet34",
                    pretrained=True):
     """

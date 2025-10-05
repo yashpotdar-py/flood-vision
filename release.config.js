@@ -1,6 +1,6 @@
 module.exports = {
   branches: ['main'],
-  repositoryUrl: 'https://github.com/btech-project-ai/flood-vision',
+  repositoryUrl: 'https://github.com/yashpotdar-py/flood-vision.git',
   plugins: [
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',

@@ -16,3 +16,6 @@ uv.lock
 
 # Data
 data/
+
+# Models
+*.pth
